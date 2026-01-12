@@ -19,6 +19,21 @@ const WEEKS = [
 
 const EXTERNAL_CAMPS = [
   {
+    id: 'newcity',
+    name: 'New City School Day Camp',
+    shortName: 'NCS Day Camp',
+    url: 'https://newcityschool.org/summer',
+    cost: 320,
+    costNote: '$256-320/week',
+    duration: '1 week',
+    regDate: 'Jan 8 (NCS) / Jan 16',
+    ageRange: 'Age 3 - 6th',
+    location: 'New City School',
+    color: 'ncs',
+    weeks: [2,3,4,5,7,8,9,10],
+    weekCosts: { 3: 256 } // June 15-19 is prorated (no camp June 19)
+  },
+  {
     id: 'grc',
     name: 'Gifted Resource Council',
     shortName: 'GRC',
@@ -64,7 +79,8 @@ const EXTERNAL_CAMPS = [
     ageRange: 'K-6th',
     location: 'St. Louis',
     color: 'pink',
-    weeks: [2,3,4,5,6,7,8,9,10,11]
+    weeks: [2,3,4,5,6,7,8,9,10,11],
+    hideFromQuickSelect: true
   },
   {
     id: 'superninja',
@@ -124,21 +140,6 @@ const EXTERNAL_CAMPS = [
     location: 'Forest Park',
     color: 'green',
     weeks: [2,3,4,5,6,7,8,9,10]
-  },
-  {
-    id: 'newcity',
-    name: 'New City School Day Camp',
-    shortName: 'NCS Day Camp',
-    url: 'https://newcityschool.org/summer',
-    cost: 320,
-    costNote: '$256-320/week',
-    duration: '1 week',
-    regDate: 'Jan 8 (NCS) / Jan 16',
-    ageRange: 'Age 3 - 6th',
-    location: 'New City School',
-    color: 'ncs',
-    weeks: [2,3,4,5,7,8,9,10],
-    weekCosts: { 3: 256 } // June 15-19 is prorated (no camp June 19)
   }
 ];
 
@@ -830,7 +831,7 @@ export default function App() {
                         </div>
                       ) : hasOptions ? (
                         <div className="flex flex-wrap gap-2">
-                          {availableCamps.slice(0, 5).map(camp => {
+                          {availableCamps.filter(c => !c.hideFromQuickSelect).slice(0, 5).map(camp => {
                             const weekCost = camp.weekCosts?.[week.id] ?? camp.cost;
                             const campSlot = camp.time === 'am' ? 'am' : camp.time === 'pm' ? 'pm' : camp.time === 'half' ? 'half' : 'full';
                             
