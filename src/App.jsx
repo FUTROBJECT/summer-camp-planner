@@ -311,23 +311,95 @@ export default function App() {
     setKids(kids.map(k => k.id === kidId ? { ...k, ...updates } : k));
   };
 
-  const handleSelectCamp = (weekId, camp) => {
-    setSelections(prev => ({
-      ...prev,
-      [activeKid]: {
-        ...(prev[activeKid] || {}),
-        [weekId]: camp
+  const handleSelectCamp = (weekId, camp, forceSlot = null) => {
+    // Determine slot: 'am', 'pm', or 'full'
+    // 'half' camps default to the first available half-day slot
+    let slot;
+    if (forceSlot) {
+      slot = forceSlot;
+    } else if (camp.time === 'am') {
+      slot = 'am';
+    } else if (camp.time === 'pm') {
+      slot = 'pm';
+    } else if (camp.time === 'half') {
+      // Half-day camp without specified slot - pick first available
+      const weekSel = selections[activeKid]?.[weekId] || {};
+      const available = getAvailableSlots(weekSel);
+      slot = available.am ? 'am' : available.pm ? 'pm' : 'full';
+    } else {
+      slot = 'full';
+    }
+    
+    setSelections(prev => {
+      const kidSel = prev[activeKid] || {};
+      const weekSel = kidSel[weekId] || {};
+      
+      let newWeekSel;
+      if (slot === 'full') {
+        // Full day clears AM/PM
+        newWeekSel = { full: { ...camp, time: 'full' } };
+      } else {
+        // Half day clears full, keeps the other half
+        newWeekSel = {
+          am: slot === 'am' ? { ...camp, time: 'am' } : (weekSel.am || null),
+          pm: slot === 'pm' ? { ...camp, time: 'pm' } : (weekSel.pm || null),
+        };
       }
-    }));
+      
+      return {
+        ...prev,
+        [activeKid]: {
+          ...kidSel,
+          [weekId]: newWeekSel
+        }
+      };
+    });
     setShowCampPicker(null);
   };
 
-  const clearWeek = (weekId) => {
+  const clearWeek = (weekId, slot = null) => {
     setSelections(prev => {
       const kidSel = { ...(prev[activeKid] || {}) };
-      delete kidSel[weekId];
+      
+      if (!slot) {
+        // Clear entire week
+        delete kidSel[weekId];
+      } else {
+        // Clear specific slot
+        const weekSel = { ...(kidSel[weekId] || {}) };
+        delete weekSel[slot];
+        
+        // If nothing left, remove the week entirely
+        if (!weekSel.am && !weekSel.pm && !weekSel.full) {
+          delete kidSel[weekId];
+        } else {
+          kidSel[weekId] = weekSel;
+        }
+      }
+      
       return { ...prev, [activeKid]: kidSel };
     });
+  };
+  
+  // Helper to get camps from week selection
+  const getWeekCamps = (weekSel) => {
+    if (!weekSel) return [];
+    const camps = [];
+    if (weekSel.full) camps.push({ ...weekSel.full, slot: 'full' });
+    if (weekSel.am) camps.push({ ...weekSel.am, slot: 'am' });
+    if (weekSel.pm) camps.push({ ...weekSel.pm, slot: 'pm' });
+    return camps;
+  };
+  
+  // Check what slots are available for a week
+  const getAvailableSlots = (weekSel) => {
+    if (!weekSel) return { am: true, pm: true, full: true };
+    if (weekSel.full) return { am: false, pm: false, full: false };
+    return {
+      am: !weekSel.am,
+      pm: !weekSel.pm,
+      full: !weekSel.am && !weekSel.pm
+    };
   };
 
   const toggleExtendedDay = (weekId) => {
@@ -371,10 +443,17 @@ export default function App() {
     let extCost = 0;
     let weeks = 0;
 
-    Object.entries(kidSelections).forEach(([weekId, camp]) => {
-      if (camp?.cost) campCost += camp.cost;
-      weeks++;
-      if (extendedDay[`${kidId}-${weekId}`] && camp?.source === 'ncs') {
+    Object.entries(kidSelections).forEach(([weekId, weekSel]) => {
+      const camps = getWeekCamps(weekSel);
+      if (camps.length > 0) weeks++;
+      
+      camps.forEach(camp => {
+        if (camp?.cost) campCost += camp.cost;
+      });
+      
+      // Extended day only if has NCS camp
+      const hasNCS = camps.some(c => c?.source === 'ncs');
+      if (extendedDay[`${kidId}-${weekId}`] && hasNCS) {
         const weekIdNum = parseInt(weekId);
         extCost += EXTENDED_DAY_PRORATED[weekIdNum] ?? EXTENDED_DAY_COST;
       }
@@ -407,12 +486,17 @@ export default function App() {
       text += "-".repeat(20) + "\n";
       
       WEEKS.forEach(week => {
-        const camp = kidSelections[week.id];
-        if (camp) {
-          text += `${week.dates}: ${camp.name}`;
-          if (camp.cost) text += ` ($${camp.cost})`;
-          if (extendedDay[`${kid.id}-${week.id}`]) text += ` + Extended Day`;
-          text += "\n";
+        const weekSel = kidSelections[week.id];
+        const camps = getWeekCamps(weekSel);
+        if (camps.length > 0) {
+          text += `${week.dates}:\n`;
+          camps.forEach(camp => {
+            text += `  - ${camp.name}`;
+            if (camp.slot !== 'full') text += ` (${camp.slot.toUpperCase()})`;
+            if (camp.cost) text += ` $${camp.cost}`;
+            text += "\n";
+          });
+          if (extendedDay[`${kid.id}-${week.id}`]) text += `  + Extended Day\n`;
         }
       });
       
@@ -635,13 +719,16 @@ export default function App() {
           <div className="divide-y">
             {WEEKS.map((week) => {
               const selected = activeSelections[week.id];
+              const selectedCamps = getWeekCamps(selected);
+              const availableSlots = getAvailableSlots(selected);
               const availableCamps = getCampsForWeek(week);
               const ncsSpecialty = getNCSSpecialty(week);
               const hasOptions = availableCamps.length > 0 || ncsSpecialty.length > 0;
+              const canAddMore = availableSlots.am || availableSlots.pm;
 
               const otherKidsThisWeek = kids
                 .filter(k => k.id !== activeKid && selections[k.id]?.[week.id])
-                .map(k => ({ ...k, camp: selections[k.id][week.id] }));
+                .map(k => ({ ...k, camps: getWeekCamps(selections[k.id][week.id]) }));
 
               return (
                 <div key={week.id} className={`p-4 ${selected ? 'bg-gray-50' : ''}`}>
@@ -656,7 +743,7 @@ export default function App() {
                               <div 
                                 key={k.id} 
                                 className={`w-4 h-4 rounded-full ${kidColors[k.color]} border-2 border-white`}
-                                title={`${k.name}: ${k.camp.name}`}
+                                title={`${k.name}: ${k.camps.map(c => c.name).join(', ')}`}
                               />
                             ))}
                           </div>
@@ -674,55 +761,89 @@ export default function App() {
 
                     {/* Selection Area */}
                     <div className="flex-1">
-                      {selected ? (
-                        <div className={`flex items-center justify-between p-3 rounded-lg border-2 ${
-                          colorClasses[selected.color] || colorClasses.gray
-                        }`}>
-                          <div className="flex items-center gap-3">
-                            <Check className="w-5 h-5" />
-                            <div>
-                              <p className="font-medium">{selected.name}</p>
-                              <p className="text-sm opacity-75">
-                                {selected.cost ? `$${selected.cost}` : 'Cost TBD'}
-                                {selected.time && ` · ${selected.time}`}
-                              </p>
+                      {selectedCamps.length > 0 ? (
+                        <div className="space-y-2">
+                          {/* Show selected camps */}
+                          {selectedCamps.map((camp, idx) => (
+                            <div key={idx} className={`flex items-center justify-between p-3 rounded-lg border-2 ${
+                              colorClasses[camp.color] || colorClasses.gray
+                            }`}>
+                              <div className="flex items-center gap-3">
+                                <Check className="w-5 h-5" />
+                                <div>
+                                  <p className="font-medium">
+                                    {camp.name}
+                                    {camp.slot !== 'full' && (
+                                      <span className="ml-2 text-xs px-2 py-0.5 rounded bg-black/10">
+                                        {camp.slot.toUpperCase()}
+                                      </span>
+                                    )}
+                                  </p>
+                                  <p className="text-sm opacity-75">
+                                    {camp.cost ? `$${camp.cost}` : 'Cost TBD'}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {camp.source === 'ncs' && idx === 0 && (
+                                  <label className="flex items-center gap-1 text-xs cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={extendedDay[`${activeKid}-${week.id}`] || false}
+                                      onChange={() => toggleExtendedDay(week.id)}
+                                      className="rounded"
+                                    />
+                                    +Ext
+                                  </label>
+                                )}
+                                {camp.url && (
+                                  <span
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={() => window.open(camp.url, '_blank', 'noopener,noreferrer')}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') window.open(camp.url, '_blank', 'noopener,noreferrer');
+                                    }}
+                                    className="p-1 hover:bg-white/50 rounded cursor-pointer"
+                                    title="Open camp website"
+                                  >
+                                    <ExternalLink className="w-4 h-4" />
+                                  </span>
+                                )}
+                                <button onClick={() => clearWeek(week.id, camp.slot)} className="p-1 hover:bg-white/50 rounded">
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {selected.source === 'ncs' && (
-                              <label className="flex items-center gap-1 text-xs cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={extendedDay[`${activeKid}-${week.id}`] || false}
-                                  onChange={() => toggleExtendedDay(week.id)}
-                                  className="rounded"
-                                />
-                                +Ext
-                              </label>
-                            )}
-                            {selected.url && (
-                              <span
-                                role="button"
-                                tabIndex={0}
-                                onClick={() => window.open(selected.url, '_blank', 'noopener,noreferrer')}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') window.open(selected.url, '_blank', 'noopener,noreferrer');
-                                }}
-                                className="p-1 hover:bg-white/50 rounded cursor-pointer"
-                                title="Open camp website"
-                              >
-                                <ExternalLink className="w-4 h-4" />
-                              </span>
-                            )}
-                            <button onClick={() => clearWeek(week.id)} className="p-1 hover:bg-white/50 rounded">
-                              <X className="w-4 h-4" />
+                          ))}
+                          
+                          {/* Add more button if half-day slots available */}
+                          {canAddMore && (
+                            <button
+                              onClick={() => setShowCampPicker(week.id)}
+                              className="w-full px-3 py-2 rounded-lg border-2 border-dashed border-gray-300 text-sm text-gray-500 hover:border-gray-400 flex items-center justify-center gap-1"
+                            >
+                              <Plus className="w-4 h-4" />
+                              Add {availableSlots.am ? 'AM' : ''}{availableSlots.am && availableSlots.pm ? ' or ' : ''}{availableSlots.pm ? 'PM' : ''} camp
                             </button>
-                          </div>
+                          )}
                         </div>
                       ) : hasOptions ? (
                         <div className="flex flex-wrap gap-2">
                           {availableCamps.slice(0, 5).map(camp => {
                             const weekCost = camp.weekCosts?.[week.id] ?? camp.cost;
+                            const campSlot = camp.time === 'am' ? 'am' : camp.time === 'pm' ? 'pm' : camp.time === 'half' ? 'half' : 'full';
+                            
+                            // Check if slot is available
+                            let slotAvailable;
+                            if (campSlot === 'half') {
+                              slotAvailable = availableSlots.am || availableSlots.pm;
+                            } else {
+                              slotAvailable = availableSlots[campSlot];
+                            }
+                            
+                            if (!slotAvailable) return null;
+                            
                             return (
                             <button
                               key={camp.id}
@@ -758,7 +879,7 @@ export default function App() {
                               </span>
                             </button>
                             );
-                          })}
+                          }).filter(Boolean)}
                           
                           {(ncsSpecialty.length > 0 || availableCamps.length > 5) && (
                             <button
@@ -787,7 +908,14 @@ export default function App() {
                       {showCampPicker === week.id && (
                         <div className="mt-3 p-4 bg-gray-50 rounded-lg border max-h-80 overflow-y-auto">
                           <div className="flex items-center justify-between mb-3">
-                            <h4 className="font-semibold text-gray-700">All Options for {week.dates}</h4>
+                            <h4 className="font-semibold text-gray-700">
+                              Options for {week.dates}
+                              {(!availableSlots.full && (availableSlots.am || availableSlots.pm)) && (
+                                <span className="ml-2 text-sm font-normal text-gray-500">
+                                  ({availableSlots.am ? 'AM' : ''}{availableSlots.am && availableSlots.pm ? ' & ' : ''}{availableSlots.pm ? 'PM' : ''} available)
+                                </span>
+                              )}
+                            </h4>
                             <button onClick={() => setShowCampPicker(null)}><X className="w-4 h-4" /></button>
                           </div>
                           
@@ -797,6 +925,17 @@ export default function App() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                               {availableCamps.map(camp => {
                                 const weekCost = camp.weekCosts?.[week.id] ?? camp.cost;
+                                const campSlot = camp.time === 'am' ? 'am' : camp.time === 'pm' ? 'pm' : camp.time === 'half' ? 'half' : 'full';
+                                
+                                let slotAvailable;
+                                if (campSlot === 'half') {
+                                  slotAvailable = availableSlots.am || availableSlots.pm;
+                                } else {
+                                  slotAvailable = availableSlots[campSlot];
+                                }
+                                
+                                if (!slotAvailable) return null;
+                                
                                 return (
                                 <button
                                   key={camp.id}
@@ -809,7 +948,14 @@ export default function App() {
                                 >
                                   <div className="flex items-start justify-between gap-2">
                                     <div className="flex-1">
-                                      <p className="font-medium text-sm">{camp.name}</p>
+                                      <p className="font-medium text-sm">
+                                        {camp.name}
+                                        {campSlot !== 'full' && (
+                                          <span className="ml-1 text-xs px-1.5 py-0.5 rounded bg-black/10">
+                                            {campSlot === 'half' ? 'AM/PM' : campSlot.toUpperCase()}
+                                          </span>
+                                        )}
+                                      </p>
                                       <p className="text-xs opacity-75">{weekCost ? `$${weekCost}` : camp.costNote}</p>
                                       <p className="text-xs opacity-60">{camp.location}</p>
                                     </div>
@@ -835,7 +981,7 @@ export default function App() {
                                   </div>
                                 </button>
                                 );
-                              })}
+                              }).filter(Boolean)}
                             </div>
                           </div>
 
@@ -857,7 +1003,22 @@ export default function App() {
                                 </span>
                               </h5>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                {ncsSpecialty.map((camp, i) => (
+                                {ncsSpecialty.map((camp, i) => {
+                                  const campSlot = camp.time === 'am' ? 'am' : camp.time === 'pm' ? 'pm' : camp.time === 'half' ? 'half' : 'full';
+                                  
+                                  let slotAvailable;
+                                  if (campSlot === 'half') {
+                                    slotAvailable = availableSlots.am || availableSlots.pm;
+                                  } else {
+                                    slotAvailable = availableSlots[campSlot];
+                                  }
+                                  
+                                  if (!slotAvailable) return null;
+                                  
+                                  // Determine display slot
+                                  const displaySlot = campSlot === 'half' ? (availableSlots.am ? 'am' : 'pm') : campSlot;
+                                  
+                                  return (
                                   <button
                                     key={i}
                                     onClick={() => handleSelectCamp(week.id, {
@@ -872,9 +1033,15 @@ export default function App() {
                                   >
                                     <span className="font-medium">{camp.name}</span>
                                     <span className="opacity-75 ml-2">${camp.cost}</span>
+                                    {campSlot !== 'full' && (
+                                      <span className="ml-1 text-xs px-1.5 py-0.5 rounded bg-black/10">
+                                        {campSlot === 'half' ? 'AM/PM' : campSlot.toUpperCase()}
+                                      </span>
+                                    )}
                                     {camp.note && <span className="text-xs block opacity-60">{camp.note}</span>}
                                   </button>
-                                ))}
+                                  );
+                                }).filter(Boolean)}
                               </div>
                             </div>
                           )}
@@ -922,11 +1089,16 @@ export default function App() {
                   </div>
                   {kidTotal.weeks > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1">
-                      {Object.entries(kidSelections).map(([weekId, camp]) => (
-                        <span key={weekId} className={`text-xs px-2 py-0.5 rounded ${colorClasses[camp.color] || colorClasses.gray}`}>
-                          {WEEKS.find(w => w.id === parseInt(weekId))?.dates.split('-')[0]}
-                        </span>
-                      ))}
+                      {Object.entries(kidSelections).map(([weekId, weekSel]) => {
+                        const camps = getWeekCamps(weekSel);
+                        if (camps.length === 0) return null;
+                        return (
+                          <span key={weekId} className={`text-xs px-2 py-0.5 rounded ${colorClasses[camps[0].color] || colorClasses.gray}`}>
+                            {WEEKS.find(w => w.id === parseInt(weekId))?.dates.split('-')[0]}
+                            {camps.length > 1 && ` (${camps.length})`}
+                          </span>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
