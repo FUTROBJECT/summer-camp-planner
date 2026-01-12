@@ -22,7 +22,7 @@ const EXTERNAL_CAMPS = [
     id: 'newcity',
     name: 'New City School Day Camp',
     shortName: 'NCS Day Camp',
-    url: 'https://newcityschool.org/summer',
+    url: 'https://summer.newcityschool.org/',
     cost: 320,
     costNote: '$256-320/week',
     duration: '1 week',
@@ -145,89 +145,141 @@ const EXTERNAL_CAMPS = [
 
 const NCS_SPECIALTY = {
   1: [
-    { name: 'Dance (3rd-6th)', cost: 325, time: 'full' },
-    { name: 'Chess Camp', cost: 180, time: 'half' },
-    { name: 'Cooking: Breakfast Bash', cost: 400, time: 'full' },
-    { name: 'Crayola Legends & Lore', cost: 280, time: 'am' },
-    { name: 'Metro Theater Creative Arts', cost: 300, time: 'full' },
-    { name: "Minecrafter's Guild", cost: 220, time: 'pm' },
-    { name: "Nature Explorer's (1st-3rd)", cost: 325, time: 'full' },
-    { name: 'RC Racing', cost: 220, time: 'am' },
-    { name: 'Sports & Games Madness', cost: 340, time: 'full' },
-    { name: 'Summer E.A.T.S.', cost: 180, time: 'am' },
+    { name: 'Dance', cost: 325, time: 'full', grades: [3,4,5,6] },
+    { name: 'Chess Camp', cost: 180, time: 'half', grades: [0,1,2,3,4,5,6] },
+    { name: 'Cooking: Breakfast Bash', cost: 400, time: 'full', grades: [3,4,5,6] },
+    { name: 'Crayola Legends & Lore', cost: 280, time: 'am', grades: [0,1,2,3,4,5] },
+    { name: 'Metro Theater Creative Arts', cost: 300, time: 'full', grades: [0,1,2,3,4,5] },
+    { name: "Minecrafter's Guild", cost: 220, time: 'pm', grades: [2,3,4,5,6] },
+    { name: "Nature Explorer's", cost: 325, time: 'full', grades: [1,2,3] },
+    { name: 'RC Racing', cost: 220, time: 'am', grades: [2,3,4,5,6] },
+    { name: 'Sports & Games Madness', cost: 340, time: 'full', grades: [0,1,2,3,4,5,6] },
+    { name: 'Summer E.A.T.S.', cost: 180, time: 'am', grades: [3,4,5,6] },
+    { name: 'Graphic Novels Galore', cost: 325, time: 'full', grades: [4,5,6] },
   ],
   2: [
-    { name: 'Basketball AM (1st-3rd)', cost: 144, time: 'am' },
-    { name: 'Chess Camp', cost: 144, time: 'half' },
-    { name: 'Cooking: World Dishes', cost: 320, time: 'full' },
-    { name: 'Crayola Artblazers', cost: 225, time: 'pm' },
-    { name: 'Metro Theater Creative Arts', cost: 225, time: 'full' },
-    { name: "Nature Explorer's", cost: 260, time: 'full' },
-    { name: 'Painting Camp', cost: 260, time: 'full' },
-    { name: 'Run, Jump, Code', cost: 225, time: 'am' },
-    { name: 'Sports & Games Madness', cost: 272, time: 'full' },
-    { name: "Summer Jammin'", cost: 144, time: 'am' },
+    { name: 'Dance', cost: 260, time: 'full', grades: [0,1,2] },
+    { name: 'Basketball', cost: 144, time: 'am', grades: [1,2,3] },
+    { name: 'Basketball', cost: 144, time: 'pm', grades: [4,5,6] },
+    { name: 'Chess Camp', cost: 144, time: 'half', grades: [0,1,2,3,4,5,6] },
+    { name: 'Cooking: World Dishes', cost: 320, time: 'full', grades: [3,4,5,6] },
+    { name: 'Crayola Artblazers', cost: 225, time: 'pm', grades: [0,1,2,3,4,5] },
+    { name: 'Metro Theater Creative Arts', cost: 225, time: 'full', grades: [0,1,2,3,4,5] },
+    { name: "Nature Explorer's", cost: 260, time: 'full', grades: [1,2,3] },
+    { name: 'Painting Camp', cost: 260, time: 'full', grades: [2,3,4,5] },
+    { name: 'Run, Jump, Code', cost: 225, time: 'am', grades: [0,1,2,3,4,5] },
+    { name: 'Sports & Games Madness', cost: 272, time: 'full', grades: [0,1,2,3,4,5,6] },
+    { name: "Summer Jammin'", cost: 144, time: 'am', grades: [3,4,5,6] },
+    { name: 'Short Story Writing', cost: 260, time: 'full', grades: [4,5,6] },
   ],
   3: [
-    { name: 'Dance (3rd-6th)', cost: 325, time: 'full' },
-    { name: 'AstroInnovators', cost: 280, time: 'pm' },
-    { name: 'Cartooning & Caricature', cost: 325, time: 'full' },
-    { name: 'Chess Camp', cost: 180, time: 'half' },
-    { name: 'Cooking: Baking', cost: 400, time: 'full' },
-    { name: 'Fairy Garden (1st-3rd)', cost: 180, time: 'am' },
-    { name: "Minecrafter's Guild", cost: 220, time: 'pm' },
-    { name: 'RC Racing', cost: 220, time: 'am' },
-    { name: 'Sports & Games Madness', cost: 325, time: 'full' },
+    { name: 'Dance', cost: 325, time: 'full', grades: [3,4,5,6] },
+    { name: 'AstroInnovators', cost: 280, time: 'pm', grades: [1,2,3,4,5] },
+    { name: 'Cartooning & Caricature', cost: 325, time: 'full', grades: [2,3,4,5] },
+    { name: 'Chess Camp', cost: 180, time: 'half', grades: [0,1,2,3,4,5,6] },
+    { name: 'Cooking: Baking', cost: 400, time: 'full', grades: [3,4,5,6] },
+    { name: 'Fairy Garden', cost: 180, time: 'am', grades: [1,2,3] },
+    { name: "Minecrafter's Guild", cost: 220, time: 'pm', grades: [2,3,4,5,6] },
+    { name: 'RC Racing', cost: 220, time: 'am', grades: [2,3,4,5,6] },
+    { name: 'Sports & Games Madness', cost: 325, time: 'full', grades: [0,1,2,3,4,5,6] },
   ],
   4: [
-    { name: 'Chess Camp', cost: 180, time: 'half' },
-    { name: 'Cooking: Handheld Delights', cost: 400, time: 'full' },
-    { name: "Crayola Artist's Passport", cost: 280, time: 'pm' },
-    { name: 'Flag Football AM (1st-3rd)', cost: 180, time: 'am' },
-    { name: 'Printmaking', cost: 325, time: 'full' },
-    { name: 'Secret Agent Lab', cost: 280, time: 'am' },
-    { name: 'Sports & Games Madness', cost: 340, time: 'full' },
+    { name: 'Dance', cost: 325, time: 'full', grades: [0,1,2] },
+    { name: 'Chess Camp', cost: 180, time: 'half', grades: [0,1,2,3,4,5,6] },
+    { name: 'Cooking: Handheld Delights', cost: 400, time: 'full', grades: [3,4,5,6] },
+    { name: "Crayola Artist's Passport", cost: 280, time: 'pm', grades: [0,1,2,3,4,5] },
+    { name: 'Flag Football', cost: 180, time: 'am', grades: [1,2,3] },
+    { name: 'Flag Football', cost: 180, time: 'pm', grades: [4,5,6] },
+    { name: 'Printmaking', cost: 325, time: 'full', grades: [2,3,4,5] },
+    { name: 'Secret Agent Lab', cost: 280, time: 'am', grades: [0,1,2,3,4,5] },
+    { name: 'Sports & Games Madness', cost: 340, time: 'full', grades: [0,1,2,3,4,5,6] },
   ],
   5: [
-    { name: "Babysitter's Club", cost: 325, time: 'am' },
-    { name: 'Chess Camp', cost: 180, time: 'half' },
-    { name: 'Drawing Camp', cost: 325, time: 'full' },
-    { name: 'KTK Theatre (4 wks $800)', cost: 800, time: 'full', note: '4-week commitment' },
-    { name: "Minecrafter's Guild", cost: 220, time: 'pm' },
-    { name: 'Rocketry Camp', cost: 280, time: 'am' },
-    { name: 'RC Racing', cost: 220, time: 'am' },
-    { name: 'Sewing Camp', cost: 180, time: 'pm' },
-    { name: 'Sports & Games Madness', cost: 340, time: 'full' },
+    { name: 'Dance', cost: 325, time: 'full', grades: [0,1,2] },
+    { name: "Babysitter's Club", cost: 325, time: 'am', grades: [3,4,5,6] },
+    { name: 'Chess Camp', cost: 180, time: 'half', grades: [0,1,2,3,4,5,6] },
+    { name: 'Drawing Camp', cost: 325, time: 'full', grades: [2,3,4,5] },
+    { name: 'KTK Theatre (4 wks)', cost: 800, time: 'full', grades: [1,2,3,4,5,6], note: '4-week commitment' },
+    { name: "Minecrafter's Guild", cost: 220, time: 'pm', grades: [2,3,4,5,6] },
+    { name: 'Rocketry Camp', cost: 280, time: 'am', grades: [2,3,4,5,6] },
+    { name: 'RC Racing', cost: 220, time: 'am', grades: [2,3,4,5,6] },
+    { name: 'Sewing Camp', cost: 180, time: 'pm', grades: [2,3,4,5,6] },
+    { name: 'Sports & Games Madness', cost: 340, time: 'full', grades: [0,1,2,3,4,5] },
   ],
   6: [
-    { name: 'Dance (3rd-6th)', cost: 325, time: 'full' },
-    { name: 'Basketball AM (1st-3rd)', cost: 180, time: 'am' },
-    { name: 'Chess Camp', cost: 180, time: 'half' },
-    { name: 'Crayola World of Design', cost: 280, time: 'am' },
-    { name: 'Sewing Camp', cost: 180, time: 'pm' },
-    { name: 'Sports & Games Madness', cost: 340, time: 'full' },
-    { name: 'Super Gross Science', cost: 280, time: 'pm' },
+    { name: 'Dance', cost: 325, time: 'full', grades: [3,4,5,6] },
+    { name: 'Art Adventures', cost: 180, time: 'am', grades: [0,1,2] },
+    { name: 'Basketball', cost: 180, time: 'am', grades: [1,2,3] },
+    { name: 'Basketball', cost: 180, time: 'pm', grades: [4,5,6] },
+    { name: 'Chess Camp', cost: 180, time: 'half', grades: [0,1,2,3,4,5,6] },
+    { name: 'Crayola World of Design', cost: 280, time: 'am', grades: [0,1,2,3,4,5] },
+    { name: 'Sewing Camp', cost: 180, time: 'pm', grades: [2,3,4,5,6] },
+    { name: 'Sports & Games Madness', cost: 340, time: 'full', grades: [0,1,2,3,4,5,6] },
+    { name: 'Super Gross Science', cost: 280, time: 'pm', grades: [0,1,2,3,4,5] },
   ],
   7: [
-    { name: 'Chess Camp', cost: 180, time: 'half' },
-    { name: 'Earth & Space Investigators', cost: 280, time: 'pm' },
-    { name: 'Fun with Felt (1st-3rd)', cost: 325, time: 'full' },
-    { name: 'RC Racing', cost: 220, time: 'am' },
-    { name: 'Sewing Camp', cost: 180, time: 'pm' },
-    { name: 'Sports & Games Madness', cost: 340, time: 'full' },
+    { name: 'Dance', cost: 325, time: 'full', grades: [0,1,2] },
+    { name: 'Art Adventures', cost: 180, time: 'am', grades: [0,1,2] },
+    { name: 'Chess Camp', cost: 180, time: 'half', grades: [0,1,2,3,4,5,6] },
+    { name: 'Earth & Space Investigators', cost: 280, time: 'pm', grades: [0,1,2,3,4,5] },
+    { name: 'Fun with Felt', cost: 325, time: 'full', grades: [1,2,3] },
+    { name: 'RC Racing', cost: 220, time: 'am', grades: [2,3,4,5,6] },
+    { name: 'Sewing Camp', cost: 180, time: 'pm', grades: [2,3,4,5,6] },
+    { name: 'Sports & Games Madness', cost: 340, time: 'full', grades: [0,1,2,3,4,5,6] },
   ],
   8: [
-    { name: 'Dance (3rd-6th)', cost: 325, time: 'full' },
-    { name: 'Chess Camp', cost: 180, time: 'half' },
-    { name: 'Crayola Wild World', cost: 280, time: 'am' },
-    { name: 'Sewing Camp', cost: 180, time: 'pm' },
-    { name: 'Sports & Games Madness', cost: 340, time: 'full' },
+    { name: 'Dance', cost: 325, time: 'full', grades: [3,4,5,6] },
+    { name: 'Art Adventures', cost: 180, time: 'am', grades: [0,1,2] },
+    { name: 'Chess Camp', cost: 180, time: 'half', grades: [0,1,2,3,4,5,6] },
+    { name: 'Crayola Wild World', cost: 280, time: 'am', grades: [0,1,2,3,4,5] },
+    { name: "Minecrafter's Guild", cost: 220, time: 'am', grades: [1,2,3] },
+    { name: "Minecrafter's Guild", cost: 220, time: 'pm', grades: [4,5,6] },
+    { name: 'Sewing Camp', cost: 180, time: 'pm', grades: [2,3,4,5,6] },
+    { name: 'Sports & Games Madness', cost: 340, time: 'full', grades: [0,1,2,3,4,5,6] },
   ],
 };
 
 const EXTENDED_DAY_COST = 110;
 const EXTENDED_DAY_PRORATED = { 3: 88 }; // June 15-19 is 4 days
 const STORAGE_KEY = 'summer-camp-planner-2026';
+
+// Helper to format grade range for display
+const formatGrades = (grades) => {
+  if (!grades || grades.length === 0) return '';
+  if (grades.length === 8 && grades.includes(-1)) return "4/5's-6th"; // All grades
+  if (grades.length === 7 && !grades.includes(-1)) return 'K-6th'; // K through 6th
+  
+  const gradeLabel = (g) => {
+    if (g === -1) return "4/5's";
+    if (g === 0) return 'K';
+    return `${g}`;
+  };
+  
+  const min = Math.min(...grades);
+  const max = Math.max(...grades);
+  
+  // Check if consecutive
+  const isConsecutive = grades.length === (max - min + 1);
+  if (isConsecutive && grades.length > 2) {
+    const minLabel = gradeLabel(min);
+    const maxLabel = max === 0 ? 'K' : `${max}th`;
+    return `${minLabel}-${maxLabel}`;
+  }
+  return grades.map(gradeLabel).join(', ');
+};
+
+// Format a single grade for display
+const formatGrade = (g) => {
+  if (g === -1) return "4/5's";
+  if (g === 0) return 'K';
+  return `${g}th`;
+};
+
+// Check if camp is available for a given grade
+const isEligibleForGrade = (camp, grade) => {
+  if (!camp.grades) return true; // No grade restriction
+  return camp.grades.includes(grade);
+};
 
 const colorClasses = {
   purple: 'bg-purple-100 border-purple-400 text-purple-800',
@@ -289,7 +341,7 @@ export default function App() {
     setKids([...kids, { 
       id: newId, 
       name: `Child ${newId}`, 
-      grade: 3,
+      grade: 4,
       color: (newId - 1) % kidColors.length 
     }]);
     setActiveKid(newId);
@@ -433,7 +485,15 @@ export default function App() {
     return camps;
   };
 
-  const getNCSSpecialty = (week) => {
+  const getNCSSpecialty = (week, filterByGrade = true) => {
+    if (!week.ncsWeek) return [];
+    const camps = NCS_SPECIALTY[week.ncsWeek] || [];
+    if (!filterByGrade || !activeKidData) return camps;
+    return camps.filter(camp => isEligibleForGrade(camp, activeKidData.grade));
+  };
+  
+  // Get all NCS specialty camps for a week (unfiltered, for "More options")
+  const getAllNCSSpecialty = (week) => {
     if (!week.ncsWeek) return [];
     return NCS_SPECIALTY[week.ncsWeek] || [];
   };
@@ -483,7 +543,7 @@ export default function App() {
       const kidSelections = selections[kid.id] || {};
       const kidTotal = calculateKidTotal(kid.id);
       
-      text += `${kid.name} (${kid.grade === 0 ? 'K' : kid.grade}th Grade)\n`;
+      text += `${kid.name} (${formatGrade(kid.grade)})\n`;
       text += "-".repeat(20) + "\n";
       
       WEEKS.forEach(week => {
@@ -581,7 +641,7 @@ export default function App() {
                 >
                   <div className={`w-3 h-3 rounded-full ${kidColors[kid.color]}`} />
                   <span>{kid.name}</span>
-                  <span className="text-xs opacity-75">({kid.grade === 0 ? 'K' : kid.grade}th)</span>
+                  <span className="text-xs opacity-75">({formatGrade(kid.grade)})</span>
                   {kidTotal.weeks > 0 && (
                     <span className={`text-xs px-1.5 py-0.5 rounded ${
                       activeKid === kid.id ? 'bg-white/20' : 'bg-gray-300'
@@ -629,13 +689,18 @@ export default function App() {
                 <div>
                   <label className="text-xs text-gray-500 block mb-1">Grade (Fall 2026)</label>
                   <select
-                    value={kids.find(k => k.id === editingKid)?.grade || 3}
+                    value={kids.find(k => k.id === editingKid)?.grade ?? 4}
                     onChange={(e) => updateKid(editingKid, { grade: parseInt(e.target.value) })}
                     className="px-3 py-2 border rounded-lg"
                   >
-                    {[0,1,2,3,4,5,6,7,8].map(g => (
-                      <option key={g} value={g}>{g === 0 ? 'K' : g}th Grade</option>
-                    ))}
+                    <option value={-1}>4/5's</option>
+                    <option value={0}>Kindergarten</option>
+                    <option value={1}>1st Grade</option>
+                    <option value={2}>2nd Grade</option>
+                    <option value={3}>3rd Grade</option>
+                    <option value={4}>4th Grade</option>
+                    <option value={5}>5th Grade</option>
+                    <option value={6}>6th Grade</option>
                   </select>
                 </div>
                 <div>
@@ -713,7 +778,7 @@ export default function App() {
           <div className={`p-4 ${kidColors[activeKidData?.color || 0]}`}>
             <h2 className="text-white font-bold text-lg">{activeKidData?.name}'s Schedule</h2>
             <p className="text-white/80 text-sm">
-              Entering {activeKidData?.grade === 0 ? 'K' : activeKidData?.grade}th Grade · May 26 – Aug 21, 2026
+              Entering {formatGrade(activeKidData?.grade)} · May 26 – Aug 21, 2026
             </p>
           </div>
           
@@ -723,7 +788,8 @@ export default function App() {
               const selectedCamps = getWeekCamps(selected);
               const availableSlots = getAvailableSlots(selected);
               const availableCamps = getCampsForWeek(week);
-              const ncsSpecialty = getNCSSpecialty(week);
+              const ncsSpecialty = getNCSSpecialty(week); // Filtered by active child's grade
+              const allNcsSpecialty = getAllNCSSpecialty(week); // All camps for expanded picker
               const hasOptions = availableCamps.length > 0 || ncsSpecialty.length > 0;
               const canAddMore = availableSlots.am || availableSlots.pm;
 
@@ -987,16 +1053,16 @@ export default function App() {
                           </div>
 
                           {/* NCS Specialty */}
-                          {ncsSpecialty.length > 0 && (
+                          {allNcsSpecialty.length > 0 && (
                             <div>
                               <h5 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center gap-2">
                                 NCS Specialty Camps 
                                 <span
                                   role="button"
                                   tabIndex={0}
-                                  onClick={() => window.open('https://newcityschool.org/summer', '_blank', 'noopener,noreferrer')}
+                                  onClick={() => window.open('https://summer.newcityschool.org/', '_blank', 'noopener,noreferrer')}
                                   onKeyDown={(e) => {
-                                    if (e.key === 'Enter') window.open('https://newcityschool.org/summer', '_blank', 'noopener,noreferrer');
+                                    if (e.key === 'Enter') window.open('https://summer.newcityschool.org/', '_blank', 'noopener,noreferrer');
                                   }}
                                   className="inline-flex items-center text-orange-600 hover:text-orange-800 cursor-pointer"
                                 >
@@ -1004,7 +1070,7 @@ export default function App() {
                                 </span>
                               </h5>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                {ncsSpecialty.map((camp, i) => {
+                                {allNcsSpecialty.map((camp, i) => {
                                   const campSlot = camp.time === 'am' ? 'am' : camp.time === 'pm' ? 'pm' : camp.time === 'half' ? 'half' : 'full';
                                   
                                   let slotAvailable;
@@ -1016,8 +1082,9 @@ export default function App() {
                                   
                                   if (!slotAvailable) return null;
                                   
-                                  // Determine display slot
-                                  const displaySlot = campSlot === 'half' ? (availableSlots.am ? 'am' : 'pm') : campSlot;
+                                  // Check if this camp is eligible for the active child
+                                  const isEligible = isEligibleForGrade(camp, activeKidData?.grade);
+                                  const gradeLabel = formatGrades(camp.grades);
                                   
                                   return (
                                   <button
@@ -1027,19 +1094,30 @@ export default function App() {
                                       cost: camp.cost,
                                       time: camp.time,
                                       color: 'ncs',
-                                      url: 'https://newcityschool.org/summer',
-                                      source: 'ncs'
+                                      url: 'https://summer.newcityschool.org/',
+                                      source: 'ncs',
+                                      grades: camp.grades
                                     })}
-                                    className={`p-2 rounded-lg border text-left text-sm hover:opacity-80 ${colorClasses.ncs}`}
+                                    disabled={!isEligible}
+                                    className={`p-2 rounded-lg border text-left text-sm hover:opacity-80 ${colorClasses.ncs} ${!isEligible ? 'opacity-40 cursor-not-allowed' : ''}`}
                                   >
-                                    <span className="font-medium">{camp.name}</span>
-                                    <span className="opacity-75 ml-2">${camp.cost}</span>
-                                    {campSlot !== 'full' && (
-                                      <span className="ml-1 text-xs px-1.5 py-0.5 rounded bg-black/10">
-                                        {campSlot === 'half' ? 'AM/PM' : campSlot.toUpperCase()}
-                                      </span>
-                                    )}
-                                    {camp.note && <span className="text-xs block opacity-60">{camp.note}</span>}
+                                    <div className="flex justify-between items-start">
+                                      <span className="font-medium">{camp.name}</span>
+                                      <span className="opacity-75">${camp.cost}</span>
+                                    </div>
+                                    <div className="flex gap-2 mt-1">
+                                      {gradeLabel && (
+                                        <span className={`text-xs px-1.5 py-0.5 rounded ${isEligible ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-600'}`}>
+                                          {gradeLabel}
+                                        </span>
+                                      )}
+                                      {campSlot !== 'full' && (
+                                        <span className="text-xs px-1.5 py-0.5 rounded bg-black/10">
+                                          {campSlot === 'half' ? 'AM/PM' : campSlot.toUpperCase()}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {camp.note && <span className="text-xs block opacity-60 mt-1">{camp.note}</span>}
                                   </button>
                                   );
                                 }).filter(Boolean)}
@@ -1068,7 +1146,7 @@ export default function App() {
                   <div className="flex items-center gap-2 mb-3">
                     <div className={`w-4 h-4 rounded-full ${kidColors[kid.color]}`} />
                     <span className="font-semibold">{kid.name}</span>
-                    <span className="text-sm text-gray-500">({kid.grade === 0 ? 'K' : kid.grade}th)</span>
+                    <span className="text-sm text-gray-500">({formatGrade(kid.grade)})</span>
                   </div>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
