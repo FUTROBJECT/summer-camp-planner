@@ -38,18 +38,19 @@ const EXTERNAL_CAMPS = [
     name: 'Gifted Resource Council',
     shortName: 'GRC',
     url: 'https://giftedresourcecouncil.org/summer-academies/',
-    cost: 520,
-    costNote: '$515-525 / 2 weeks',
+    cost: 540,
+    costNote: '$540/2wks ($515 early bird)',
     duration: '2 weeks',
     regDate: 'Jan 5 (members) / Jan 16',
     grades: [0,1,2,3,4,5,6,7,8],
     ageRange: 'K-8th',
     location: 'Creve Coeur',
     color: 'purple',
+    twoWeekRequired: true,
     sessions: [
-      { weeks: [2,3], name: 'Session 1 (June 8-19)' },
-      { weeks: [4,5], name: 'Session 2 (June 22-July 3)' },
-      { weeks: [7,8], name: 'Session 3 (July 13-24)' },
+      { weeks: [2,3], name: 'Session 1 (June 8-19)', cost: 540 },
+      { weeks: [4,5], name: 'Session 2 (June 22-July 3)', cost: 540 },
+      { weeks: [7,8], name: 'Session 3 (July 13-24)', cost: 540 },
     ]
   },
   {
@@ -383,28 +384,53 @@ export default function App() {
       slot = 'full';
     }
     
-    setSelections(prev => {
-      const kidSel = prev[activeKid] || {};
-      const weekSel = kidSel[weekId] || {};
-      
-      let newWeekSel;
-      if (slot === 'full') {
-        // Full day clears AM/PM
-        newWeekSel = { full: { ...camp, time: 'full' } };
-      } else {
-        // Half day clears full, keeps the other half
-        newWeekSel = {
-          am: slot === 'am' ? { ...camp, time: 'am' } : (weekSel.am || null),
-          pm: slot === 'pm' ? { ...camp, time: 'pm' } : (weekSel.pm || null),
-        };
+    // Check if this is a 2-week required camp (like GRC)
+    const originalCamp = EXTERNAL_CAMPS.find(c => c.id === camp.id);
+    const isTwoWeek = originalCamp?.twoWeekRequired && originalCamp?.sessions;
+    
+    let weeksToUpdate = [weekId];
+    let sessionInfo = null;
+    
+    if (isTwoWeek) {
+      // Find which session this week belongs to
+      sessionInfo = originalCamp.sessions.find(s => s.weeks.includes(weekId));
+      if (sessionInfo) {
+        weeksToUpdate = sessionInfo.weeks;
       }
+    }
+    
+    setSelections(prev => {
+      const kidSel = { ...(prev[activeKid] || {}) };
+      
+      weeksToUpdate.forEach((wId, idx) => {
+        const weekSel = kidSel[wId] || {};
+        
+        // For 2-week camps: full cost on first week, mark second as "included"
+        const campForWeek = {
+          ...camp,
+          time: 'full',
+          cost: isTwoWeek ? (idx === 0 ? (sessionInfo?.cost || camp.cost) : 0) : camp.cost,
+          sessionName: sessionInfo?.name,
+          isSecondWeek: idx === 1,
+          pairedWeek: isTwoWeek ? weeksToUpdate[idx === 0 ? 1 : 0] : null
+        };
+        
+        let newWeekSel;
+        if (slot === 'full') {
+          newWeekSel = { full: campForWeek };
+        } else {
+          newWeekSel = {
+            am: slot === 'am' ? { ...campForWeek, time: 'am' } : (weekSel.am || null),
+            pm: slot === 'pm' ? { ...campForWeek, time: 'pm' } : (weekSel.pm || null),
+          };
+        }
+        
+        kidSel[wId] = newWeekSel;
+      });
       
       return {
         ...prev,
-        [activeKid]: {
-          ...kidSel,
-          [weekId]: newWeekSel
-        }
+        [activeKid]: kidSel
       };
     });
     setShowCampPicker(null);
@@ -413,20 +439,40 @@ export default function App() {
   const clearWeek = (weekId, slot = null) => {
     setSelections(prev => {
       const kidSel = { ...(prev[activeKid] || {}) };
+      const weekSel = kidSel[weekId];
+      
+      // Check if this is part of a 2-week camp
+      const campInSlot = slot ? weekSel?.[slot] : (weekSel?.full || weekSel?.am || weekSel?.pm);
+      const pairedWeek = campInSlot?.pairedWeek;
       
       if (!slot) {
         // Clear entire week
         delete kidSel[weekId];
+        // Also clear paired week if it's a 2-week camp
+        if (pairedWeek) {
+          delete kidSel[pairedWeek];
+        }
       } else {
         // Clear specific slot
-        const weekSel = { ...(kidSel[weekId] || {}) };
-        delete weekSel[slot];
+        const newWeekSel = { ...weekSel };
+        delete newWeekSel[slot];
         
         // If nothing left, remove the week entirely
-        if (!weekSel.am && !weekSel.pm && !weekSel.full) {
+        if (!newWeekSel.am && !newWeekSel.pm && !newWeekSel.full) {
           delete kidSel[weekId];
         } else {
-          kidSel[weekId] = weekSel;
+          kidSel[weekId] = newWeekSel;
+        }
+        
+        // Also clear paired week if it's a 2-week camp
+        if (pairedWeek && kidSel[pairedWeek]) {
+          const pairedWeekSel = { ...kidSel[pairedWeek] };
+          delete pairedWeekSel[slot || 'full'];
+          if (!pairedWeekSel.am && !pairedWeekSel.pm && !pairedWeekSel.full) {
+            delete kidSel[pairedWeek];
+          } else {
+            kidSel[pairedWeek] = pairedWeekSel;
+          }
         }
       }
       
@@ -847,7 +893,8 @@ export default function App() {
                                     )}
                                   </p>
                                   <p className="text-sm opacity-75">
-                                    {camp.cost ? `$${camp.cost}` : 'Cost TBD'}
+                                    {camp.isSecondWeek ? 'Wk 2 of 2 (included)' : camp.cost ? `$${camp.cost}` : 'Cost TBD'}
+                                    {camp.sessionName && !camp.isSecondWeek && <span className="ml-1 text-xs">· 2-week session</span>}
                                   </p>
                                 </div>
                               </div>
