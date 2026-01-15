@@ -48,9 +48,9 @@ const EXTERNAL_CAMPS = [
     color: 'purple',
     twoWeekRequired: true,
     sessions: [
-      { weeks: [2,3], name: 'Session 1 (June 8-19)', cost: 540 },
-      { weeks: [4,5], name: 'Session 2 (June 22-July 3)', cost: 540 },
-      { weeks: [7,8], name: 'Session 3 (July 13-24)', cost: 540 },
+      { weeks: [2,3], name: 'Session 1 (June 8-18)', cost: 540 },
+      { weeks: [4,5], name: 'Session 2 (June 22-July 2)', cost: 540 },
+      { weeks: [6,7], name: 'Session 3 (July 6-17)', cost: 540 },
     ]
   },
   {
